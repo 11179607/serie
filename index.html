@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuestra Serie 💕</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; background: #000; overflow-x: hidden; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #fff; }
+
+  /* ---------- PANTALLA PLAY ---------- */
+  #pantallaPlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: radial-gradient(circle at center, #1a0008 0%, #000 70%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 30px; transition: opacity 0.6s;
+  }
+  .titulo-play {
+    font-size: 1.3rem; letter-spacing: 3px; color: #ffb6c1;
+    text-transform: uppercase; text-align: center; padding: 0 20px;
+    animation: latidoSuave 2s infinite;
+  }
+  @keyframes latidoSuave {
+    0%,100% { opacity: 0.7; } 50% { opacity: 1; }
+  }
+  .boton-play {
+    width: 110px; height: 110px; border-radius: 50%;
+    background: linear-gradient(145deg, #e50914, #b20710);
+    border: 4px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 50px rgba(229,9,20,0.7), 0 0 100px rgba(229,9,20,0.3);
+    transition: transform 0.2s, box-shadow 0.3s;
+    animation: pulsoPlay 1.8s infinite;
+  }
+  .boton-play:hover { transform: scale(1.08); }
+  .boton-play:active { transform: scale(0.95); }
+  @keyframes pulsoPlay {
+    0%,100% { box-shadow: 0 0 50px rgba(229,9,20,0.7), 0 0 100px rgba(229,9,20,0.3); }
+    50% { box-shadow: 0 0 80px rgba(229,9,20,1), 0 0 140px rgba(229,9,20,0.5); }
+  }
+  .triangulo {
+    width: 0; height: 0;
+    border-left: 38px solid #fff;
+    border-top: 24px solid transparent;
+    border-bottom: 24px solid transparent;
+    margin-left: 12px;
+  }
+
+  /* ---------- INTRO NETFLIX CON IMAGEN REAL ---------- */
+  #introNetflix {
+    position: fixed; inset: 0; z-index: 110;
+    background: #000; display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #introNetflix.activa { display: flex; }
+
+  .contenedor-n {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: zoomN 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  @keyframes zoomN {
+    0%   { transform: scale(0.15); opacity: 0; filter: brightness(0.5); }
+    30%  { transform: scale(0.9);  opacity: 1; filter: brightness(1); }
+    50%  { transform: scale(1);    opacity: 1; filter: brightness(1.2); }
+    75%  { transform: scale(1.05); opacity: 1; filter: brightness(1); }
+    100% { transform: scale(1.1);  opacity: 0; filter: brightness(1); }
+  }
+
+  /* AQUÍ SE MUESTRA LA IMAGEN DEL LOGO */
+  .logo-imagen {
+    width: 250px; /* Ajusta el tamaño si lo quieres más grande o pequeño */
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 2;
+    border-radius: 15%; /* Para que respete la forma de la app */
+  }
+
+  /* Destello de luz que recorre el logo */
+  .brillo-n {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.4) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: brilloRecorre 1.8s ease-in-out 0.6s;
+    z-index: 3;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    border-radius: 15%;
+  }
+  @keyframes brilloRecorre {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* Línea roja inferior estilo Netflix */
+  .linea-netflix {
+    width: 0;
+    height: 5px;
+    background: linear-gradient(90deg, transparent, #e50914, transparent);
+    margin-top: 30px;
+    animation: lineaCrece 2.4s ease forwards;
+    box-shadow: 0 0 20px rgba(229,9,20,0.8);
+  }
+  @keyframes lineaCrece {
+    0%, 40% { width: 0; opacity: 0; }
+    60%     { width: 0; opacity: 1; }
+    100%    { width: 250px; opacity: 1; }
+  }
+
+  /* ---------- PANTALLA PRINCIPAL (NETFLIX) ---------- */
+  #pantallaNetflix { display: none; min-height: 100vh; padding-bottom: 60px; }
+  #pantallaNetflix.activa { display: block; }
+
+  .header-netflix {
+    position: sticky; top: 0; z-index: 50;
+    padding: 16px 22px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo-nf {
+    color: #e50914; font-size: 1.8rem; font-weight: 900;
+    font-family: 'Arial Black', sans-serif; letter-spacing: -2px;
+  }
+  .perfil {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: linear-gradient(135deg, #ff6b9d, #c44569);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .hero {
+    padding: 30px 22px 10px;
+    text-align: center;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+  }
+  .hero h1 {
+    font-size: 2rem; color: #fff; margin-bottom: 10px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+  }
+  .hero .genero {
+    color: #e50914; font-size: 0.85rem; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .hero p {
+    font-size: 0.95rem; color: #ccc; line-height: 1.6;
+    max-width: 500px; margin: 0 auto 16px;
+  }
+  .hero .meta {
+    display: flex; gap: 14px; justify-content: center;
+    font-size: 0.8rem; color: #aaa; flex-wrap: wrap;
+  }
+  .match { color: #46d369; font-weight: bold; }
+
+  /* ---------- FILAS / CATEGORÍAS (SCROLL HORIZONTAL) ---------- */
+  .categoria { margin-top: 34px; padding: 0 22px; }
+  .categoria h2 {
+    font-size: 1.15rem; margin-bottom: 14px; color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .categoria h2::before {
+    content: ''; width: 4px; height: 18px; background: #e50914;
+    border-radius: 2px;
+  }
+
+  .fila {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #e50914 transparent;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .fila::-webkit-scrollbar { height: 6px; }
+  .fila::-webkit-scrollbar-thumb { background: #e50914; border-radius: 3px; }
+  .fila::-webkit-scrollbar-track { background: transparent; }
+
+  .tarjeta {
+    flex: 0 0 260px;
+    background: #141414;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    cursor: pointer;
+    border: 1px solid #222;
+  }
+  .tarjeta:hover {
+    transform: scale(1.04);
+    box-shadow: 0 12px 30px rgba(229,9,20,0.35);
+    border-color: #e50914;
+  }
+  .tarjeta .img-cont {
+    width: 100%; height: 160px;
+    background: linear-gradient(135deg, #1a1a1a, #2a0a12);
+    overflow: hidden;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tarjeta .img-cont::before {
+    content: '📸'; font-size: 2.5rem; opacity: 0.25;
+    position: absolute;
+  }
+  .tarjeta img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block; position: relative; z-index: 1;
+    transition: transform 0.5s;
+  }
+  .tarjeta:hover img { transform: scale(1.05); }
+
+  .tarjeta .numero {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    z-index: 2;
+    border: 1px solid rgba(229,9,20,0.6);
+  }
+
+  .tarjeta .info { padding: 14px; }
+  .tarjeta .info h3 {
+    font-size: 0.95rem; color: #fff; margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .tarjeta .info p {
+    font-size: 0.8rem; color: #aaa; line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .tarjeta .info .duracion {
+    font-size: 0.72rem; color: #e50914;
+    display: flex; align-items: center; gap: 6px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .tarjeta .info .duracion::before {
+    content: '❤'; font-size: 0.8rem;
+  }
+
+  .footer-nf {
+    text-align: center; margin-top: 50px; padding: 20px;
+    color: #666; font-size: 0.8rem; line-height: 1.6;
+  }
+  .footer-nf .corazon { color: #e50914; font-size: 1.4rem; margin-bottom: 8px; animation: latidoSuave 2s infinite; }
+
+  /* ---------- EXPLOSIÓN CORAZONES ---------- */
+  .explosion {
+    position: fixed; pointer-events: none; z-index: 200;
+    font-size: 1.4rem; animation: volar 1.8s ease-out forwards;
+  }
+  @keyframes volar {
+    0% { transform: translate(0,0) scale(0.4); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(var(--rot)); opacity: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 1.5rem; }
+    .tarjeta { flex: 0 0 220px; }
+    .tarjeta .img-cont { height: 140px; }
+    .logo-imagen { width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ---------- 1. PANTALLA PLAY ---------- -->
+<div id="pantallaPlay">
+  <div class="titulo-play">Nuestra historia tiene una serie</div>
+  <div class="boton-play" onclick="iniciarIntro()">
+    <div class="triangulo"></div>
+  </div>
+</div>
+
+<!-- ---------- 2. INTRO NETFLIX CON TU IMAGEN ---------- -->
+<div id="introNetflix">
+  <div class="contenedor-n">
+    <!-- AQUÍ ESTÁ TU IMAGEN, ASEGÚRATE DE TENERLA GUARDADA EN ESA RUTA -->
+    <img src="imagenes/netflix-logo.png" alt="Netflix" class="logo-imagen">
+    <div class="brillo-n"></div>
+  </div>
+  <div class="linea-netflix"></div>
+</div>
+
+<!-- ---------- 3. PANTALLA NETFLIX ---------- -->
+<div id="pantallaNetflix">
+  <header class="header-netflix">
+    <div class="logo-nf">N</div>
+    <div class="perfil">💕</div>
+  </header>
+
+  <section class="hero">
+    <div class="genero">Serie romántica · Original</div>
+    <h1>Mi Bebecita</h1>
+    <p>Una historia real, escrita con risas, lágrimas, peleas y reconciliaciones. Protagonizada por ti y por mí, y dirigida por el corazón.</p>
+    <div class="meta">
+      <span class="match">100% para ti</span>
+      <span>2023 – ∞</span>
+      <span>💖 10/10</span>
+    </div>
+  </section>
+
+  <!-- CATEGORÍA 1 -->
+  <section class="categoria">
+    <h2>Nuestro comienzo</h2>
+    <div class="fila">
+      <div class="tarjeta">
+        <div class="img-cont">
+          <div class="numero">CAP. 01</div>
+          <img src="imagenes/foto1.jpg" alt="Nuestro comienzo" onerror="this.style.display='none'">
+        </div>
+        <div class="info">
+          <h3>El día que te conocí</h3>
+          <p>21 de septiembre de 2023. Sin saberlo, ese día empezó la historia más bonita de mi vida.</p>
+          <div class="duracion">Para siempre</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍA 2 -->
+  <section class="categoria">
+    <h2>Momentos felices</h2>
+    <div class="fila">
+      <div class="tarjeta">
+        <div class="img-cont">
+          <div class="numero">CAP. 02</div>
+          <img src="imagenes/foto2.jpg" alt="Momentos felices" onerror="this.style.display='none'">
+        </div>
+        <div class="info">
+          <h3>Nuestras risas</h3>
+          <p>Cada risa contigo es mi escena favorita. Contigo hasta lo simple se vuelve mágico.</p>
+          <div class="duracion">Toda una vida</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍA 3 -->
+  <section class="categoria">
+    <h2>Los difíciles también cuentan</h2>
+    <div class="fila">
+      <div class="tarjeta">
+        <div class="img-cont">
+          <div class="numero">CAP. 03</div>
+          <img src="imagenes/foto3.jpg" alt="Los difíciles también cuentan" onerror="this.style.display='none'">
+        </div>
+        <div class="info">
+          <h3>Las tormentas</h3>
+          <p>Hemos peleado, hemos llorado, hemos querido rendirnos… pero siempre elegimos quedarnos.</p>
+          <div class="duracion">Corazón valiente</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍA 4 -->
+  <section class="categoria">
+    <h2>Reconciliaciones</h2>
+    <div class="fila">
+      <div class="tarjeta">
+        <div class="img-cont">
+          <div class="numero">CAP. 04</div>
+          <img src="imagenes/foto4.jpg" alt="Reconciliaciones" onerror="this.style.display='none'">
+        </div>
+        <div class="info">
+          <h3>Volver a nosotros</h3>
+          <p>Cada abrazo después de una pelea me recuerda por qué te elijo una y otra vez.</p>
+          <div class="duracion">Sin fecha de fin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORÍA 5 -->
+  <section class="categoria">
+    <h2>Nuestro futuro</h2>
+    <div class="fila">
+      <div class="tarjeta">
+        <div class="img-cont">
+          <div class="numero">CAP. 05</div>
+          <img src="imagenes/foto5.jpg" alt="Nuestro futuro" onerror="this.style.display='none'">
+        </div>
+        <div class="info">
+          <h3>Lo que viene</h3>
+          <p>No sé qué nos depare el futuro, pero sé con quién quiero vivirlo: contigo, mi bebecita.</p>
+          <div class="duracion">∞</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-nf">
+    <div class="corazon">❤️</div>
+    <div>Por siempre mi bebecita</div>
+    <div style="margin-top:6px; font-size:0.72rem; color:#444;">Hecho con amor, solo para ti.</div>
+  </footer>
+</div>
+
+<script>
+  /* ---------- Sonido tipo Netflix (Web Audio API) ---------- */
+  function reproducirTadum() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ahora = ctx.currentTime;
+
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(180, ahora);
+      osc1.frequency.exponentialRampToValueAtTime(90, ahora + 0.18);
+      gain1.gain.setValueAtTime(0.0001, ahora);
+      gain1.gain.exponentialRampToValueAtTime(0.5, ahora + 0.01);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.22);
+      osc1.connect(gain1); gain1.connect(ctx.destination);
+      osc1.start(ahora); osc1.stop(ahora + 0.25);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(140, ahora + 0.25);
+      osc2.frequency.exponentialRampToValueAtTime(70, ahora + 0.55);
+      gain2.gain.setValueAtTime(0.0001, ahora + 0.25);
+      gain2.gain.exponentialRampToValueAtTime(0.6, ahora + 0.27);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.6);
+      osc2.connect(gain2); gain2.connect(ctx.destination);
+      osc2.start(ahora + 0.25); osc2.stop(ahora + 0.65);
+    } catch (e) { console.log('Audio no disponible'); }
+  }
+
+  /* ---------- Flujo: Play → Intro → Netflix ---------- */
+  function iniciarIntro() {
+    const play = document.getElementById('pantallaPlay');
+    const intro = document.getElementById('introNetflix');
+
+    play.style.opacity = '0';
+    setTimeout(() => { play.style.display = 'none'; }, 500);
+
+    setTimeout(() => {
+      reproducirTadum();
+      intro.classList.add('activa');
+
+      setTimeout(() => {
+        intro.classList.remove('activa');
+        const netflix = document.getElementById('pantallaNetflix');
+        netflix.classList.add('activa');
+        setTimeout(lanzarExplosion, 400);
+      }, 5000);
+    }, 400);
+  }
+
+  /* ---------- Explosión de corazones ---------- */
+  function lanzarExplosion() {
+    for (let i = 0; i < 50; i++) {
+      const c = document.createElement('div');
+      c.className = 'explosion';
+      c.textContent = ['❤️','❤️','💖','💗','🌹'][Math.floor(Math.random()*5)];
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      c.style.left = cx + 'px';
+      c.style.top = cy + 'px';
+      const ang = Math.random() * Math.PI * 2;
+      const dist = Math.random() * 380 + 80;
+      c.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      c.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+      c.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+      c.style.animationDuration = (Math.random()*1+1.2)+'s';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 2200);
+    }
+  }
+</script>
+</body>
+</html>
