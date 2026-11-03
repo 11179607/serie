@@ -35,7 +35,6 @@
     transition: transform 0.2s, box-shadow 0.3s;
     animation: pulsoPlay 1.8s infinite;
   }
-  .boton-play:hover { transform: scale(1.08); }
   .boton-play:active { transform: scale(0.95); }
   @keyframes pulsoPlay {
     0%,100% { box-shadow: 0 0 50px rgba(229,9,20,0.7), 0 0 100px rgba(229,9,20,0.3); }
@@ -277,7 +276,6 @@
     font: inherit;
     cursor: pointer;
   }
-  .mensaje-lateral-cerrar:hover { background: rgba(229,9,20,0.8); }
   .perfil {
     width: 36px; height: 36px; border-radius: 6px;
     background: linear-gradient(135deg, #ff6b9d, #c44569);
@@ -395,7 +393,7 @@
   .hero-acciones button {
     min-height: 40px;
     padding: 0 17px;
-    border: 0;
+    border: 1px solid rgba(255,255,255,0.42);
     border-radius: 4px;
     display: inline-flex;
     align-items: center;
@@ -403,11 +401,16 @@
     font: inherit;
     font-size: 0.88rem;
     font-weight: 700;
+    color: #fff;
+    background: rgba(18,12,16,0.42);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 18px rgba(0,0,0,0.18);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
   }
-  .boton-reproducir { background: #fff; color: #111; }
-  .boton-info { background: rgba(109,109,110,0.72); color: #fff; }
+  .hero-acciones .boton-reproducir { background-color: rgba(229,9,20,0.2); }
+  .hero-acciones .boton-info { background-color: rgba(255,255,255,0.1); }
   .carta-dialogo {
     width: min(680px, calc(100vw - 32px));
     max-width: none;
@@ -451,7 +454,6 @@
     border-radius: 5px;
     background: #b20710;
   }
-  .carta-cerrar:hover { background: #e50914; }
   .hero-capitulos {
     position: relative;
     z-index: 2;
@@ -719,8 +721,8 @@
     .barra-lateral button:hover::after { opacity: 1; transform: translate(0, -50%); }
     .mensaje-lateral-cerrar:hover { background: rgba(229,9,20,0.8); }
     .hero-acciones button:hover { transform: translateY(-2px); }
-    .boton-reproducir:hover { background: #e7e7e7; }
-    .boton-info:hover { background: rgba(109,109,110,0.95); }
+    .hero-acciones .boton-reproducir:hover { background-color: rgba(229,9,20,0.42); border-color: rgba(255,255,255,0.72); }
+    .hero-acciones .boton-info:hover { background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.72); }
     .carta-cerrar:hover { background: #e50914; }
     .mini-capitulo:hover { transform: translateY(-3px); border-color: #e50914; }
     .categoria:hover .tarjeta img { transform: scale(1.035); }
@@ -842,11 +844,11 @@
     <div class="hero-copy">
       <div class="marca-serie"> SERIE ORIGINAL</div>
       <div class="genero">Una historia romántica · MiniSerie</div>
-      <h1>Mi Bebecita</h1>
+      <h1>Mi Bebeshita 💖</h1>
       <p>Una historia real, escrita con risas, lágrimas, peleas y reconciliaciones. Protagonizada por ti y por mí, y dirigida por el corazón.</p>
       <div class="meta">
         <span class="match">100% para ti</span>
-        <span>2023 – ∞</span>
+        <span>2023  ∞</span>
         <span>💖 10/10</span>
       </div>
       <div class="hero-acciones">
@@ -1192,6 +1194,13 @@
     carrusel.addEventListener('scroll', actualizarNavegacion, { passive: true });
     carrusel.addEventListener('wheel', (event) => {
       if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        const slide = event.target.closest('.slide-serie');
+        const puedeDesplazarVerticalmente = slide &&
+          slide.scrollHeight > slide.clientHeight &&
+          ((event.deltaY < 0 && slide.scrollTop > 0) ||
+            (event.deltaY > 0 && slide.scrollTop + slide.clientHeight < slide.scrollHeight - 1));
+
+        if (puedeDesplazarVerticalmente) return;
         event.preventDefault();
         carrusel.scrollBy({ left: event.deltaY });
       }
