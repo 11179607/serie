@@ -83,6 +83,32 @@
     z-index: 2;
     border-radius: 15%; /* Para que respete la forma de la app */
   }
+  .logo-fallback {
+    width: 250px;
+    height: 250px;
+    border-radius: 18%;
+    background: linear-gradient(135deg, #e50914, #7a0710);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    font-weight: 900;
+    color: #fff;
+    box-shadow: 0 0 40px rgba(229,9,20,0.5);
+  }
+
+  .fallback-card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
 
   /* Destello de luz que recorre el logo */
   .brillo-n {
@@ -293,7 +319,7 @@
 <div id="introNetflix">
   <div class="contenedor-n">
     <!-- AQUÍ ESTÁ TU IMAGEN, ASEGÚRATE DE TENERLA GUARDADA EN ESA RUTA -->
-    <img src="imagenes/netflix-logo.png" alt="Netflix" class="logo-imagen">
+    <img src="imagenes/netflix-logo.png" alt="Netflix" class="logo-imagen" onerror="mostrarLogoFallback(this)">
     <div class="brillo-n"></div>
   </div>
   <div class="linea-netflix"></div>
@@ -324,7 +350,7 @@
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 01</div>
-          <img src="imagenes/foto1.jpg" alt="Nuestro comienzo" onerror="this.style.display='none'">
+          <img src="imagenes/foto1.jpg" alt="Nuestro comienzo" data-fallback="💞" data-bg="linear-gradient(135deg, #2a0a12, #7a0d1e)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>El día que te conocí</h3>
@@ -342,7 +368,7 @@
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 02</div>
-          <img src="imagenes/foto2.jpg" alt="Momentos felices" onerror="this.style.display='none'">
+          <img src="imagenes/foto2.jpg" alt="Momentos felices" data-fallback="💖" data-bg="linear-gradient(135deg, #1b1b2f, #451b6b)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Nuestras risas</h3>
@@ -360,7 +386,7 @@
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 03</div>
-          <img src="imagenes/foto3.jpg" alt="Los difíciles también cuentan" onerror="this.style.display='none'">
+          <img src="imagenes/foto3.jpg" alt="Los difíciles también cuentan" data-fallback="🌧️" data-bg="linear-gradient(135deg, #1d1d1d, #3d2d1a)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Las tormentas</h3>
@@ -378,7 +404,7 @@
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 04</div>
-          <img src="imagenes/foto4.jpg" alt="Reconciliaciones" onerror="this.style.display='none'">
+          <img src="imagenes/foto4.jpg" alt="Reconciliaciones" data-fallback="💘" data-bg="linear-gradient(135deg, #0d1d2d, #0b4b72)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Volver a nosotros</h3>
@@ -396,7 +422,7 @@
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 05</div>
-          <img src="imagenes/foto5.jpg" alt="Nuestro futuro" onerror="this.style.display='none'">
+          <img src="imagenes/foto5.jpg" alt="Nuestro futuro" data-fallback="✨" data-bg="linear-gradient(135deg, #251a14, #7a4d1b)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Lo que viene</h3>
@@ -415,6 +441,29 @@
 </div>
 
 <script>
+  function mostrarFallback(img) {
+    const contenedor = img.closest('.img-cont');
+    if (!contenedor || contenedor.querySelector('.fallback-card')) return;
+
+    const fallback = document.createElement('div');
+    fallback.className = 'fallback-card';
+    fallback.textContent = img.dataset.fallback || '💖';
+    fallback.style.background = img.dataset.bg || 'linear-gradient(135deg, #1a1a1a, #2a0a12)';
+    contenedor.appendChild(fallback);
+    img.style.display = 'none';
+  }
+
+  function mostrarLogoFallback(img) {
+    const contenedor = img.parentElement;
+    if (contenedor.querySelector('.logo-fallback')) return;
+
+    const fallback = document.createElement('div');
+    fallback.className = 'logo-fallback';
+    fallback.textContent = 'N';
+    img.style.display = 'none';
+    contenedor.appendChild(fallback);
+  }
+
   /* ---------- Sonido tipo Netflix (Web Audio API) ---------- */
   function reproducirTadum() {
     try {
