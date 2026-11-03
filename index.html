@@ -6,8 +6,8 @@
 <title>Nuestra Serie 💕</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { min-height: 100%; background: #000; overflow-x: hidden; }
-  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #fff; }
+  html, body { min-height: 100%; background: #000; overflow: hidden; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #fff; overflow-y: hidden; }
 
   /* ---------- PANTALLA PLAY ---------- */
   #pantallaPlay {
@@ -66,12 +66,30 @@
     justify-content: center;
     animation: zoomN 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
   }
+  .contenedor-wordmark {
+    display: none;
+    width: min(82vw, 560px);
+    aspect-ratio: 16 / 9;
+    animation: revelarNetflix 0.5s steps(7, end) forwards;
+    clip-path: inset(0 86% 0 14%);
+  }
+  .contenedor-wordmark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #introNetflix.fase-netflix .contenedor-n { display: none; }
+  #introNetflix.fase-netflix .contenedor-wordmark { display: block; }
   @keyframes zoomN {
     0%   { transform: scale(0.15); opacity: 0; filter: brightness(0.5); }
     30%  { transform: scale(0.9);  opacity: 1; filter: brightness(1); }
     50%  { transform: scale(1);    opacity: 1; filter: brightness(1.2); }
     75%  { transform: scale(1.05); opacity: 1; filter: brightness(1); }
     100% { transform: scale(1.1);  opacity: 0; filter: brightness(1); }
+  }
+  @keyframes revelarNetflix {
+    to { clip-path: inset(0 14% 0 14%); }
   }
 
   /* AQUÍ SE MUESTRA LA IMAGEN DEL LOGO */
@@ -150,94 +168,351 @@
   }
 
   /* ---------- PANTALLA PRINCIPAL (NETFLIX) ---------- */
-  #pantallaNetflix { display: none; min-height: 100vh; padding-bottom: 60px; }
+  #pantallaNetflix {
+    display: none;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #080608;
+  }
   #pantallaNetflix.activa { display: block; }
 
   .header-netflix {
-    position: sticky; top: 0; z-index: 50;
+    position: absolute; inset: 0 0 auto; z-index: 50;
     padding: 16px 22px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.9), transparent);
     display: flex; align-items: center; justify-content: space-between;
   }
   .logo-nf {
-    color: #e50914; font-size: 1.8rem; font-weight: 900;
-    font-family: 'Arial Black', sans-serif; letter-spacing: -2px;
+    display: block;
+    width: 82px;
+    height: auto;
+    object-fit: contain;
   }
+  .barra-lateral {
+    position: absolute;
+    z-index: 55;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .barra-lateral button {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    color: #bdb8bb;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .barra-lateral button:hover,
+  .barra-lateral button:focus-visible { color: #fff; transform: scale(1.15); }
   .perfil {
     width: 36px; height: 36px; border-radius: 6px;
     background: linear-gradient(135deg, #ff6b9d, #c44569);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
+    overflow: hidden;
+  }
+  .perfil-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .hero {
-    padding: 30px 22px 10px;
+  .carrusel-serie {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .carrusel-serie::-webkit-scrollbar { display: none; }
+
+  .slide-serie {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 84px 22px 94px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+    white-space: normal;
+    overflow: hidden;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgba(111, 12, 38, 0.26), transparent 62%),
+      linear-gradient(145deg, #10090d, #050505 72%);
+  }
+  .slide-serie::after {
+    content: '';
+    position: absolute;
+    inset: 12% 8%;
+    border: 1px solid rgba(255,255,255,0.045);
+    border-radius: 24px;
+    pointer-events: none;
+  }
+  .hero {
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 96px 34px 92px 86px;
+    text-align: left;
+    background:
+      linear-gradient(90deg, #090709 0%, rgba(9,7,9,0.96) 24%, rgba(9,7,9,0.4) 72%, rgba(9,7,9,0.12) 100%),
+      linear-gradient(0deg, #090709 4%, transparent 62%),
+      radial-gradient(ellipse at 74% 35%, rgba(186,18,55,0.38), transparent 42%),
+      url("imagenes/portada.jpeg") center 55% / cover no-repeat;
+  }
+  .hero::after { display: none; }
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    width: min(58%, 600px);
+    margin: auto 0 18px;
+  }
+  .hero .marca-serie {
+    margin-bottom: 10px;
+    color: #e50914;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 3px;
   }
   .hero h1 {
-    font-size: 2rem; color: #fff; margin-bottom: 10px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    font-size: clamp(2.2rem, 5.2vw, 4.3rem);
+    color: #fff;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 24px rgba(229,9,20,0.34);
   }
   .hero .genero {
-    color: #e50914; font-size: 0.85rem; letter-spacing: 2px;
-    text-transform: uppercase; margin-bottom: 14px;
+    color: #e7e1e3;
+    font-size: 0.78rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
   }
   .hero p {
-    font-size: 0.95rem; color: #ccc; line-height: 1.6;
-    max-width: 500px; margin: 0 auto 16px;
+    font-size: 0.94rem;
+    color: #d0c9cc;
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: 13px;
   }
   .hero .meta {
     display: flex; gap: 14px; justify-content: center;
     font-size: 0.8rem; color: #aaa; flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 17px;
   }
   .match { color: #46d369; font-weight: bold; }
-
-  /* ---------- FILAS / CATEGORÍAS (SCROLL HORIZONTAL) ---------- */
-  .categoria { margin-top: 34px; padding: 0 22px; }
-  .categoria h2 {
-    font-size: 1.15rem; margin-bottom: 14px; color: #fff;
-    display: flex; align-items: center; gap: 8px;
+  .hero-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hero-acciones button {
+    min-height: 40px;
+    padding: 0 17px;
+    border: 0;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
   }
-  .categoria h2::before {
-    content: ''; width: 4px; height: 18px; background: #e50914;
-    border-radius: 2px;
+  .hero-acciones button:hover { transform: translateY(-2px); }
+  .boton-reproducir { background: #fff; color: #111; }
+  .boton-reproducir:hover { background: #e7e7e7; }
+  .boton-info { background: rgba(109,109,110,0.72); color: #fff; }
+  .boton-info:hover { background: rgba(109,109,110,0.95); }
+  .carta-dialogo {
+    width: min(680px, calc(100vw - 32px));
+    max-width: none;
+    max-height: min(82vh, 760px);
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    color: #f7eef1;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 18px;
+    background:
+      radial-gradient(ellipse at 85% 0%, rgba(147,15,50,0.25), transparent 42%),
+      linear-gradient(145deg, #1a1116, #090709 75%);
+    box-shadow: 0 24px 90px rgba(0,0,0,0.75), 0 0 40px rgba(229,9,20,0.12);
+  }
+  .carta-dialogo::backdrop { background: rgba(0,0,0,0.82); backdrop-filter: blur(7px); }
+  .carta-contenido { max-height: min(82vh, 760px); overflow-y: auto; padding: 30px clamp(22px, 5vw, 44px) 34px; }
+  .carta-etiqueta {
+    margin-bottom: 10px;
+    color: #f0788a;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+  }
+  .carta-contenido h2 { margin-bottom: 18px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(1.7rem, 5vw, 2.35rem); }
+  .carta-contenido p { margin-bottom: 15px; color: #d7cbd0; font-size: 0.96rem; line-height: 1.8; }
+  .carta-contenido .carta-saludo { color: #fff; font-family: Georgia, 'Times New Roman', serif; font-size: 1.12rem; }
+  .carta-firma { margin-top: 22px; color: #f0788a; font-family: Georgia, 'Times New Roman', serif; font-size: 1.12rem; }
+  .carta-cerrar {
+    position: sticky;
+    bottom: 0;
+    display: block;
+    margin: 8px 0 0 auto;
+    padding: 10px 18px;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border: 0;
+    border-radius: 5px;
+    background: #b20710;
+  }
+  .carta-cerrar:hover { background: #e50914; }
+  .hero-capitulos {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    margin-top: auto;
+  }
+  .hero-capitulos h2 {
+    margin-bottom: 9px;
+    color: #f5f2f3;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .hero-capitulos h2 span {
+    color: #aaa0a4;
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.7px;
+  }
+  .mini-fila {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mini-fila::-webkit-scrollbar { display: none; }
+  .mini-capitulo {
+    flex: 0 0 clamp(98px, 13vw, 148px);
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 5px;
+    overflow: hidden;
+    background: #171316;
+    color: #eee;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .mini-capitulo:hover,
+  .mini-capitulo:focus-visible {
+    transform: translateY(-3px);
+    border-color: #e50914;
+  }
+  .mini-imagen {
+    position: relative;
+    display: flex;
+    height: clamp(58px, 10vh, 86px);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2a0a12, #7a0d1e);
+    font-size: 1.7rem;
+  }
+  .mini-capitulo:nth-child(2) .mini-imagen { background: linear-gradient(135deg, #1b1b2f, #451b6b); }
+  .mini-capitulo:nth-child(3) .mini-imagen { background: linear-gradient(135deg, #1d1d1d, #3d2d1a); }
+  .mini-capitulo:nth-child(4) .mini-imagen { background: linear-gradient(135deg, #0d1d2d, #0b4b72); }
+  .mini-capitulo:nth-child(5) .mini-imagen { background: linear-gradient(135deg, #251a14, #7a4d1b); }
+  .mini-imagen img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #080608;
+  }
+  .mini-numero {
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    z-index: 1;
+    color: #fff;
+    font-size: 0.58rem;
+    text-shadow: 0 1px 5px #000;
+  }
+  .mini-titulo {
+    display: block;
+    padding: 6px 7px;
+    overflow: hidden;
+    font-size: 0.66rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ---------- CAPÍTULOS A PANTALLA COMPLETA ---------- */
+  .categoria {
+    gap: 14px;
+  }
+  .capitulo-1 { font-family: Georgia, 'Times New Roman', serif; }
+  .capitulo-2 { font-family: 'Trebuchet MS', Arial, sans-serif; }
+  .capitulo-3 { font-family: 'Courier New', monospace; }
+  .capitulo-4 { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; }
+  .capitulo-5 { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif; }
+  .categoria h2 {
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    color: #fff;
   }
 
   .fila {
     display: flex;
-    overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: #e50914 transparent;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    width: min(100%, 560px);
+    justify-content: center;
   }
-  .fila::-webkit-scrollbar { height: 6px; }
-  .fila::-webkit-scrollbar-thumb { background: #e50914; border-radius: 3px; }
-  .fila::-webkit-scrollbar-track { background: transparent; }
 
   .tarjeta {
-    flex: 0 0 260px;
-    background: #141414;
-    border-radius: 10px;
+    width: 100%;
+    max-height: 100%;
+    background: linear-gradient(145deg, rgba(34,24,28,0.96), rgba(15,13,15,0.98));
+    border-radius: 18px;
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-    cursor: pointer;
-    border: 1px solid #222;
-  }
-  .tarjeta:hover {
-    transform: scale(1.04);
-    box-shadow: 0 12px 30px rgba(229,9,20,0.35);
-    border-color: #e50914;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.55), 0 0 34px rgba(229,9,20,0.12);
   }
   .tarjeta .img-cont {
-    width: 100%; height: 160px;
+    width: 100%;
+    height: clamp(150px, 32vh, 300px);
     background: linear-gradient(135deg, #1a1a1a, #2a0a12);
     overflow: hidden;
     position: relative;
     display: flex; align-items: center; justify-content: center;
+  }
+  .tarjeta .img-cont::after {
+    content: '';
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(transparent, rgba(13,10,12,0.55));
+    z-index: 1;
+    pointer-events: none;
   }
   .tarjeta .img-cont::before {
     content: '📸'; font-size: 2.5rem; opacity: 0.25;
@@ -245,10 +520,11 @@
   }
   .tarjeta img {
     width: 100%; height: 100%; object-fit: cover;
+    background: #080608;
     display: block; position: relative; z-index: 1;
-    transition: transform 0.5s;
+    transition: transform 0.7s;
   }
-  .tarjeta:hover img { transform: scale(1.05); }
+  .categoria:hover .tarjeta img { transform: scale(1.035); }
 
   .tarjeta .numero {
     position: absolute;
@@ -263,13 +539,13 @@
     border: 1px solid rgba(229,9,20,0.6);
   }
 
-  .tarjeta .info { padding: 14px; }
+  .tarjeta .info { padding: 14px 20px 18px; text-align: left; }
   .tarjeta .info h3 {
-    font-size: 0.95rem; color: #fff; margin-bottom: 8px;
+    font-size: clamp(1rem, 2.2vw, 1.25rem); color: #fff; margin-bottom: 7px;
     line-height: 1.3;
   }
   .tarjeta .info p {
-    font-size: 0.8rem; color: #aaa; line-height: 1.5;
+    font-size: 0.88rem; color: #c1babe; line-height: 1.5;
     margin-bottom: 10px;
   }
   .tarjeta .info .duracion {
@@ -282,10 +558,63 @@
   }
 
   .footer-nf {
-    text-align: center; margin-top: 50px; padding: 20px;
-    color: #666; font-size: 0.8rem; line-height: 1.6;
+    color: #d7cbd0;
+    font-size: 1rem;
+    line-height: 1.8;
   }
-  .footer-nf .corazon { color: #e50914; font-size: 1.4rem; margin-bottom: 8px; animation: latidoSuave 2s infinite; }
+  .footer-nf .corazon { color: #e50914; font-size: 3rem; margin-bottom: 8px; animation: latidoSuave 2s infinite; }
+  .footer-nf > div:last-child { color: #887b81; }
+  .cierre-serie {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(147, 15, 50, 0.3), transparent 58%),
+      linear-gradient(145deg, #10090d, #050505 72%);
+  }
+
+  .navegacion-serie {
+    position: absolute;
+    z-index: 60;
+    inset: auto 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #d7cbd0;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+  }
+  .navegacion-serie button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 50%;
+    background: rgba(15,10,12,0.72);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .navegacion-serie button:hover:not(:disabled) {
+    background: #e50914;
+    transform: scale(1.08);
+  }
+  .navegacion-serie button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .progreso-serie {
+    width: 72px;
+    height: 3px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+  }
+  .progreso-serie span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: #e50914;
+    transition: width 0.3s ease;
+  }
 
   /* ---------- EXPLOSIÓN CORAZONES ---------- */
   .explosion {
@@ -298,10 +627,45 @@
   }
 
   @media (max-width: 480px) {
-    .hero h1 { font-size: 1.5rem; }
-    .tarjeta { flex: 0 0 220px; }
-    .tarjeta .img-cont { height: 140px; }
+    .slide-serie { padding: 76px 18px 84px; }
+    .slide-serie::after { inset: 8% 4%; }
+    .hero {
+      padding: 78px 14px 88px 58px;
+      gap: 0;
+    }
+    .barra-lateral { left: 7px; gap: 13px; }
+    .barra-lateral button { width: 34px; height: 34px; }
+    .hero { background-position: center, center, center, 60% center; }
+    .hero-copy { width: 100%; margin: 0 0 12px; }
+    .hero .marca-serie { margin-bottom: 5px; }
+    .hero h1 { font-size: 2rem; margin-bottom: 7px; }
+    .hero .genero { font-size: 0.66rem; margin-bottom: 7px; }
+    .hero p { font-size: 0.78rem; line-height: 1.45; margin-bottom: 8px; }
+    .hero .meta { gap: 9px; font-size: 0.68rem; margin-bottom: 10px; }
+    .hero-acciones { gap: 7px; }
+    .hero-acciones button { min-height: 34px; padding: 0 10px; font-size: 0.74rem; }
+    .hero-capitulos { margin-top: auto; }
+    .hero-capitulos h2 { font-size: 0.8rem; }
+    .hero-capitulos h2 span { font-size: 0.58rem; }
+    .mini-capitulo { flex-basis: 102px; }
+    .mini-imagen { height: 62px; }
+    .tarjeta .img-cont { height: clamp(135px, 28vh, 220px); }
+    .tarjeta .info { padding: 12px 16px 14px; }
+    .tarjeta .info p { font-size: 0.82rem; }
     .logo-imagen { width: 180px; }
+  }
+  @media (max-height: 620px) {
+    .hero { padding-top: 72px; padding-bottom: 78px; }
+    .hero-copy { margin-bottom: 6px; }
+    .hero p { margin-bottom: 8px; }
+    .mini-imagen { height: 54px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>
 </head>
@@ -322,35 +686,80 @@
     <img src="imagenes/netflix-logo.png" alt="Netflix" class="logo-imagen" onerror="mostrarLogoFallback(this)">
     <div class="brillo-n"></div>
   </div>
+  <div class="contenedor-wordmark" aria-label="Netflix">
+    <img src="imagenes/netflix2.png" alt="Netflix">
+  </div>
   <div class="linea-netflix"></div>
 </div>
 
 <!-- ---------- 3. PANTALLA NETFLIX ---------- -->
 <div id="pantallaNetflix">
   <header class="header-netflix">
-    <div class="logo-nf">N</div>
-    <div class="perfil">💕</div>
+    <img class="logo-nf" src="imagenes/netflix2.png" alt="Netflix">
+    <div class="perfil">
+      <img src="imagenes/netflix-logo.png" alt="N" class="perfil-logo">
+    </div>
   </header>
 
-  <section class="hero">
-    <div class="genero">Serie romántica · Original</div>
-    <h1>Mi Bebecita</h1>
-    <p>Una historia real, escrita con risas, lágrimas, peleas y reconciliaciones. Protagonizada por ti y por mí, y dirigida por el corazón.</p>
-    <div class="meta">
-      <span class="match">100% para ti</span>
-      <span>2023 – ∞</span>
-      <span>💖 10/10</span>
+  <aside class="barra-lateral" aria-label="Accesos rápidos">
+    <button type="button" aria-label="Inicio" data-slide-target="0">⌂</button>
+    <button type="button" aria-label="Nuestro comienzo" data-slide-target="1">♡</button>
+    <button type="button" aria-label="Momentos felices" data-slide-target="2">▦</button>
+    <button type="button" aria-label="Final de temporada" data-slide-target="6">∞</button>
+  </aside>
+
+  <main class="carrusel-serie" id="carruselSerie" aria-label="Historia de nuestra serie" tabindex="0">
+  <section class="slide-serie hero" aria-label="Presentación">
+    <div class="hero-copy">
+      <div class="marca-serie"> SERIE ORIGINAL</div>
+      <div class="genero">Una historia romántica · MiniSerie</div>
+      <h1>Mi Bebecita</h1>
+      <p>Una historia real, escrita con risas, lágrimas, peleas y reconciliaciones. Protagonizada por ti y por mí, y dirigida por el corazón.</p>
+      <div class="meta">
+        <span class="match">100% para ti</span>
+        <span>2023 – ∞</span>
+        <span>💖 10/10</span>
+      </div>
+      <div class="hero-acciones">
+        <button type="button" class="boton-reproducir" data-slide-target="1"><span aria-hidden="true">▶</span> Reproducir historia</button>
+        <button type="button" class="boton-info" id="abrirCarta"><span aria-hidden="true">ⓘ</span> Más información</button>
+      </div>
+    </div>
+    <div class="hero-capitulos">
+      <h2>Nuestra historia <span>DESLIZA PARA VER MÁS&nbsp; →</span></h2>
+      <div class="mini-fila" aria-label="Capítulos de la historia">
+        <button type="button" class="mini-capitulo" data-slide-target="1" aria-label="Abrir capítulo 1: El día que te conocí">
+          <span class="mini-imagen"><span>💞</span><span class="mini-numero">CAP. 01</span><img src="imagenes/el dia que te conoci.jpeg" alt="" onerror="this.style.display='none'"></span>
+          <span class="mini-titulo">El día que te conocí</span>
+        </button>
+        <button type="button" class="mini-capitulo" data-slide-target="2" aria-label="Abrir capítulo 2: Nuestras risas">
+          <span class="mini-imagen"><span>💖</span><span class="mini-numero">CAP. 02</span><img src="imagenes/nuestras risas.jpeg" alt="" onerror="this.style.display='none'"></span>
+          <span class="mini-titulo">Nuestras risas</span>
+        </button>
+        <button type="button" class="mini-capitulo" data-slide-target="3" aria-label="Abrir capítulo 3: Las tormentas">
+          <span class="mini-imagen"><span>🌧️</span><span class="mini-numero">CAP. 03</span><img src="imagenes/las tormentos.jpeg" alt="" onerror="this.style.display='none'"></span>
+          <span class="mini-titulo">Las tormentas</span>
+        </button>
+        <button type="button" class="mini-capitulo" data-slide-target="4" aria-label="Abrir capítulo 4: Volver a nosotros">
+          <span class="mini-imagen"><span>💘</span><span class="mini-numero">CAP. 04</span><img src="imagenes/volver a nosotros.jpeg" alt="" onerror="this.style.display='none'"></span>
+          <span class="mini-titulo">Volver a nosotros</span>
+        </button>
+        <button type="button" class="mini-capitulo" data-slide-target="5" aria-label="Abrir capítulo 5: Lo que viene">
+          <span class="mini-imagen"><span>✨</span><span class="mini-numero">CAP. 05</span><img src="imagenes/lo que se viene.jpeg" alt="" onerror="this.style.display='none'"></span>
+          <span class="mini-titulo">Lo que viene</span>
+        </button>
+      </div>
     </div>
   </section>
 
   <!-- CATEGORÍA 1 -->
-  <section class="categoria">
+  <section class="slide-serie categoria capitulo-1" aria-label="Capítulo 1: Nuestro comienzo">
     <h2>Nuestro comienzo</h2>
     <div class="fila">
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 01</div>
-          <img src="imagenes/foto1.jpg" alt="Nuestro comienzo" data-fallback="💞" data-bg="linear-gradient(135deg, #2a0a12, #7a0d1e)" onerror="mostrarFallback(this)">
+          <img src="imagenes/el dia que te conoci.jpeg" alt="Nuestro comienzo" data-fallback="💞" data-bg="linear-gradient(135deg, #2a0a12, #7a0d1e)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>El día que te conocí</h3>
@@ -362,13 +771,13 @@
   </section>
 
   <!-- CATEGORÍA 2 -->
-  <section class="categoria">
+  <section class="slide-serie categoria capitulo-2" aria-label="Capítulo 2: Momentos felices">
     <h2>Momentos felices</h2>
     <div class="fila">
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 02</div>
-          <img src="imagenes/foto2.jpg" alt="Momentos felices" data-fallback="💖" data-bg="linear-gradient(135deg, #1b1b2f, #451b6b)" onerror="mostrarFallback(this)">
+          <img src="imagenes/nuestras risas.jpeg" alt="Momentos felices" data-fallback="💖" data-bg="linear-gradient(135deg, #1b1b2f, #451b6b)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Nuestras risas</h3>
@@ -380,13 +789,13 @@
   </section>
 
   <!-- CATEGORÍA 3 -->
-  <section class="categoria">
+  <section class="slide-serie categoria capitulo-3" aria-label="Capítulo 3: Los difíciles también cuentan">
     <h2>Los difíciles también cuentan</h2>
     <div class="fila">
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 03</div>
-          <img src="imagenes/foto3.jpg" alt="Los difíciles también cuentan" data-fallback="🌧️" data-bg="linear-gradient(135deg, #1d1d1d, #3d2d1a)" onerror="mostrarFallback(this)">
+          <img src="imagenes/las tormentos.jpeg" alt="Los difíciles también cuentan" data-fallback="🌧️" data-bg="linear-gradient(135deg, #1d1d1d, #3d2d1a)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Las tormentas</h3>
@@ -398,13 +807,13 @@
   </section>
 
   <!-- CATEGORÍA 4 -->
-  <section class="categoria">
+  <section class="slide-serie categoria capitulo-4" aria-label="Capítulo 4: Reconciliaciones">
     <h2>Reconciliaciones</h2>
     <div class="fila">
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 04</div>
-          <img src="imagenes/foto4.jpg" alt="Reconciliaciones" data-fallback="💘" data-bg="linear-gradient(135deg, #0d1d2d, #0b4b72)" onerror="mostrarFallback(this)">
+          <img src="imagenes/volver a nosotros.jpeg" alt="Reconciliaciones" data-fallback="💘" data-bg="linear-gradient(135deg, #0d1d2d, #0b4b72)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Volver a nosotros</h3>
@@ -416,13 +825,13 @@
   </section>
 
   <!-- CATEGORÍA 5 -->
-  <section class="categoria">
+  <section class="slide-serie categoria capitulo-5" aria-label="Capítulo 5: Nuestro futuro">
     <h2>Nuestro futuro</h2>
     <div class="fila">
       <div class="tarjeta">
         <div class="img-cont">
           <div class="numero">CAP. 05</div>
-          <img src="imagenes/foto5.jpg" alt="Nuestro futuro" data-fallback="✨" data-bg="linear-gradient(135deg, #251a14, #7a4d1b)" onerror="mostrarFallback(this)">
+          <img src="imagenes/lo que se viene.jpeg" alt="Nuestro futuro" data-fallback="✨" data-bg="linear-gradient(135deg, #251a14, #7a4d1b)" onerror="mostrarFallback(this)">
         </div>
         <div class="info">
           <h3>Lo que viene</h3>
@@ -433,12 +842,36 @@
     </div>
   </section>
 
-  <footer class="footer-nf">
-    <div class="corazon">❤️</div>
-    <div>Por siempre mi bebecita</div>
-    <div style="margin-top:6px; font-size:0.72rem; color:#444;">Hecho con amor, solo para ti.</div>
-  </footer>
+  <section class="slide-serie cierre-serie" aria-label="Final de temporada">
+    <footer class="footer-nf">
+      <div class="corazon">❤️</div>
+      <div>Por siempre mi bebecita</div>
+      <div>Hecho con amor, solo para ti.</div>
+    </footer>
+  </section>
+  </main>
+  <nav class="navegacion-serie" aria-label="Navegación de capítulos">
+    <button type="button" id="anteriorSlide" aria-label="Pantalla anterior">←</button>
+    <div class="progreso-serie" aria-hidden="true"><span id="barraProgreso"></span></div>
+    <button type="button" id="siguienteSlide" aria-label="Siguiente pantalla">→</button>
+  </nav>
 </div>
+
+<dialog class="carta-dialogo" id="cartaAmor" aria-labelledby="tituloCarta">
+  <div class="carta-contenido">
+    <div class="carta-etiqueta">Una carta para nosotros</div>
+    <h2 id="tituloCarta">Amar también es aprender</h2>
+    <p class="carta-saludo">Mi bebecita:</p>
+    <p>Quiero recordarte que una relación no está hecha solamente de días perfectos. También hay momentos en que el cansancio, las preocupaciones o las diferencias nos ponen a prueba. A veces podemos entendernos mal, decir algo sin pensar o sentir que el otro no logra ver lo que llevamos dentro. Esos momentos duelen, pero no tienen que definir toda nuestra historia.</p>
+    <p>Cuando llegan las dificultades, superar una etapa no significa fingir que nada pasó ni guardar silencio para evitar una conversación. Significa encontrar un momento para escucharnos con calma, hablar con honestidad y tratar de comprender lo que sintió cada uno. No se trata de ganar una discusión: se trata de cuidar el vínculo y buscar juntos una solución que nos haga bien.</p>
+    <p>También significa reconocer nuestros errores y pedir perdón de corazón, sin orgullo y sin poner excusas. Perdonar no borra lo ocurrido de un instante a otro; es decidir dar espacio para reparar, recuperar la confianza con acciones y aprender de lo que nos lastimó. Los cambios verdaderos se demuestran poco a poco, con respeto, paciencia y coherencia.</p>
+    <p>Habrá días en los que necesitemos respirar antes de responder, darnos un abrazo, volver a conversar o simplemente acompañarnos en silencio. Respetar nuestros tiempos y nuestros sentimientos también es una forma de amar. Lo importante es que podamos ser sinceros, poner límites sanos y recordar que ninguno tiene que cargar solo con todo.</p>
+    <p>Las relaciones se fortalecen cuando ambos eligen participar: celebrar lo bonito, hablar de lo que cuesta y hacer equipo frente a los problemas. No siempre tendremos todas las respuestas, pero podemos buscarlas con cariño, pedir ayuda si la necesitamos y construir acuerdos que nos permitan avanzar sin dejar de ser nosotros mismos.</p>
+    <p>Yo atesoro cada risa y cada recuerdo feliz, pero también valoro lo que aprendemos cuando atravesamos una tormenta y encontramos una manera más amable de acercarnos. Nuestra historia no tiene que ser perfecta para ser especial; puede ser real, estar llena de aprendizajes y seguir escribiéndose con cuidado, respeto y amor.</p>
+    <p class="carta-firma">Con todo mi amor,<br>siempre de tu lado. ❤️</p>
+    <button type="button" class="carta-cerrar" id="cerrarCarta">Cerrar carta</button>
+  </div>
+</dialog>
 
 <script>
   function mostrarFallback(img) {
@@ -504,15 +937,97 @@
 
     setTimeout(() => {
       reproducirTadum();
+      intro.classList.remove('fase-netflix');
       intro.classList.add('activa');
 
       setTimeout(() => {
-        intro.classList.remove('activa');
-        const netflix = document.getElementById('pantallaNetflix');
-        netflix.classList.add('activa');
-        setTimeout(lanzarExplosion, 400);
-      }, 5000);
+        intro.classList.add('fase-netflix');
+        setTimeout(() => {
+          intro.classList.remove('activa', 'fase-netflix');
+          const netflix = document.getElementById('pantallaNetflix');
+          netflix.classList.add('activa');
+          if (carrusel) carrusel.scrollLeft = 0;
+          actualizarNavegacion();
+          setTimeout(lanzarExplosion, 400);
+        }, 1700);
+      }, 2400);
     }, 400);
+  }
+
+  const carrusel = document.getElementById('carruselSerie');
+  const botonAnterior = document.getElementById('anteriorSlide');
+  const botonSiguiente = document.getElementById('siguienteSlide');
+  const cartaDialogo = document.getElementById('cartaAmor');
+  const abrirCarta = document.getElementById('abrirCarta');
+  const cerrarCarta = document.getElementById('cerrarCarta');
+  const barraProgreso = document.getElementById('barraProgreso');
+  const slides = carrusel ? Array.from(carrusel.children) : [];
+  const capitulos = slides.filter((slide) => slide.classList.contains('categoria'));
+
+  function indiceSlideActual() {
+    if (!carrusel || !carrusel.clientWidth) return 0;
+    return Math.max(0, Math.min(
+      slides.length - 1,
+      Math.round(carrusel.scrollLeft / carrusel.clientWidth)
+    ));
+  }
+
+  function actualizarNavegacion() {
+    if (!slides.length) return;
+    const indice = indiceSlideActual();
+    const slideActual = slides[indice];
+    const indiceCapitulo = capitulos.indexOf(slideActual);
+
+    if (indiceCapitulo >= 0) {
+      barraProgreso.style.width = `${((indiceCapitulo + 1) / capitulos.length) * 100}%`;
+    } else if (slideActual.classList.contains('hero')) {
+      barraProgreso.style.width = '0%';
+    } else {
+      barraProgreso.style.width = '100%';
+    }
+
+    botonAnterior.disabled = indice === 0;
+    botonSiguiente.disabled = indice === slides.length - 1;
+  }
+
+  function irASlide(indice) {
+    if (!carrusel) return;
+    const indiceSeguro = Math.max(0, Math.min(slides.length - 1, indice));
+    carrusel.scrollTo({
+      left: indiceSeguro * carrusel.clientWidth
+    });
+  }
+
+  document.querySelectorAll('[data-slide-target]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      irASlide(Number(boton.dataset.slideTarget));
+    });
+  });
+
+  abrirCarta.addEventListener('click', () => cartaDialogo.showModal());
+  cerrarCarta.addEventListener('click', () => cartaDialogo.close());
+  cartaDialogo.addEventListener('click', (event) => {
+    if (event.target === cartaDialogo) cartaDialogo.close();
+  });
+
+  if (carrusel) {
+    botonAnterior.addEventListener('click', () => irASlide(indiceSlideActual() - 1));
+    botonSiguiente.addEventListener('click', () => irASlide(indiceSlideActual() + 1));
+    carrusel.addEventListener('scroll', actualizarNavegacion, { passive: true });
+    carrusel.addEventListener('wheel', (event) => {
+      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        event.preventDefault();
+        carrusel.scrollBy({ left: event.deltaY });
+      }
+    }, { passive: false });
+    carrusel.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        irASlide(indiceSlideActual() + (event.key === 'ArrowRight' ? 1 : -1));
+      }
+    });
+    window.addEventListener('resize', actualizarNavegacion);
+    actualizarNavegacion();
   }
 
   /* ---------- Explosión de corazones ---------- */
