@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Nuestra Serie 💕</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -172,6 +172,8 @@
     display: none;
     position: fixed;
     inset: 0;
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: #080608;
   }
@@ -179,7 +181,7 @@
 
   .header-netflix {
     position: absolute; inset: 0 0 auto; z-index: 50;
-    padding: 16px 22px;
+    padding: calc(16px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) 16px calc(22px + env(safe-area-inset-left));
     background: linear-gradient(180deg, rgba(0,0,0,0.9), transparent);
     display: flex; align-items: center; justify-content: space-between;
   }
@@ -192,7 +194,7 @@
   .barra-lateral {
     position: absolute;
     z-index: 55;
-    left: 18px;
+    left: max(18px, env(safe-area-inset-left));
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -200,6 +202,7 @@
     gap: 18px;
   }
   .barra-lateral button {
+    position: relative;
     width: 36px;
     height: 36px;
     border: 0;
@@ -209,8 +212,72 @@
     cursor: pointer;
     transition: color 0.2s, transform 0.2s;
   }
-  .barra-lateral button:hover,
   .barra-lateral button:focus-visible { color: #fff; transform: scale(1.15); }
+  .barra-lateral button:focus-visible,
+  .hero-acciones button:focus-visible,
+  .mini-capitulo:focus-visible,
+  .navegacion-serie button:focus-visible,
+  .volver-portada:focus-visible,
+  .mensaje-lateral-cerrar:focus-visible,
+  .carta-cerrar:focus-visible {
+    outline: 2px solid #ff9aaf;
+    outline-offset: 3px;
+  }
+  .barra-lateral button::after {
+    content: attr(data-etiqueta);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    width: max-content;
+    max-width: 180px;
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: #fff;
+    background: rgba(15,10,12,0.96);
+    box-shadow: 0 5px 16px rgba(0,0,0,0.45);
+    font: 600 0.75rem/1.2 'Helvetica Neue', Arial, sans-serif;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-4px, -50%);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+  }
+  .barra-lateral button:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
+  .mensaje-lateral {
+    position: fixed;
+    z-index: 75;
+    left: 66px;
+    top: 50%;
+    width: min(280px, calc(100vw - 82px));
+    padding: 16px 38px 16px 16px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 12px;
+    color: #f7eef1;
+    background: linear-gradient(145deg, rgba(42,20,29,0.98), rgba(15,10,13,0.98));
+    box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 22px rgba(229,9,20,0.16);
+    opacity: 0;
+    transform: translate(-8px, -50%) scale(0.96);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    pointer-events: none;
+  }
+  .mensaje-lateral[hidden] { display: none; }
+  .mensaje-lateral.visible { opacity: 1; transform: translate(0, -50%) scale(1); pointer-events: auto; }
+  .mensaje-lateral strong { display: block; margin-bottom: 5px; color: #ff9aaf; font-size: 0.85rem; }
+  .mensaje-lateral p { color: #eee1e6; font-size: 0.82rem; line-height: 1.5; }
+  .mensaje-lateral-cerrar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 25px;
+    height: 25px;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    font: inherit;
+    cursor: pointer;
+  }
+  .mensaje-lateral-cerrar:hover { background: rgba(229,9,20,0.8); }
   .perfil {
     width: 36px; height: 36px; border-radius: 6px;
     background: linear-gradient(135deg, #ff6b9d, #c44569);
@@ -235,6 +302,7 @@
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
   }
   .carrusel-serie::-webkit-scrollbar { display: none; }
 
@@ -244,20 +312,24 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    padding: 84px 22px 94px;
+    padding: calc(84px + env(safe-area-inset-top)) 22px calc(94px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     white-space: normal;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    overscroll-behavior-y: contain;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     background:
       radial-gradient(ellipse at 50% 42%, rgba(111, 12, 38, 0.26), transparent 62%),
       linear-gradient(145deg, #10090d, #050505 72%);
   }
+  .slide-serie::-webkit-scrollbar { display: none; }
   .slide-serie::after {
     content: '';
     position: absolute;
@@ -334,11 +406,8 @@
     cursor: pointer;
     transition: transform 0.2s, background 0.2s;
   }
-  .hero-acciones button:hover { transform: translateY(-2px); }
   .boton-reproducir { background: #fff; color: #111; }
-  .boton-reproducir:hover { background: #e7e7e7; }
   .boton-info { background: rgba(109,109,110,0.72); color: #fff; }
-  .boton-info:hover { background: rgba(109,109,110,0.95); }
   .carta-dialogo {
     width: min(680px, calc(100vw - 32px));
     max-width: none;
@@ -413,7 +482,7 @@
   }
   .mini-fila::-webkit-scrollbar { display: none; }
   .mini-capitulo {
-    flex: 0 0 clamp(98px, 13vw, 148px);
+    flex: 0 0 clamp(118px, 14vw, 164px);
     padding: 0;
     border: 1px solid rgba(255,255,255,0.14);
     border-radius: 5px;
@@ -424,9 +493,7 @@
     cursor: pointer;
     transition: transform 0.2s, border-color 0.2s;
   }
-  .mini-capitulo:hover,
   .mini-capitulo:focus-visible {
-    transform: translateY(-3px);
     border-color: #e50914;
   }
   .mini-imagen {
@@ -462,11 +529,15 @@
   }
   .mini-titulo {
     display: block;
-    padding: 6px 7px;
+    min-height: 2.5em;
+    padding: 7px 8px;
     overflow: hidden;
-    font-size: 0.66rem;
+    font-size: 0.74rem;
+    line-height: 1.3;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   /* ---------- CAPÍTULOS A PANTALLA COMPLETA ---------- */
@@ -479,8 +550,24 @@
   .capitulo-4 { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; }
   .capitulo-5 { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif; }
   .categoria h2 {
+    position: relative;
+    padding-bottom: 9px;
     font-size: clamp(1.35rem, 3vw, 2rem);
     color: #fff;
+  }
+  .categoria h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 42px;
+    height: 2px;
+    border-radius: 2px;
+    background: #e50914;
+    transform: translateX(-50%);
+  }
+  .categoria .tarjeta {
+    border-color: rgba(229,9,20,0.22);
   }
 
   .fila {
@@ -524,7 +611,6 @@
     display: block; position: relative; z-index: 1;
     transition: transform 0.7s;
   }
-  .categoria:hover .tarjeta img { transform: scale(1.035); }
 
   .tarjeta .numero {
     position: absolute;
@@ -562,8 +648,22 @@
     font-size: 1rem;
     line-height: 1.8;
   }
-  .footer-nf .corazon { color: #e50914; font-size: 3rem; margin-bottom: 8px; animation: latidoSuave 2s infinite; }
-  .footer-nf > div:last-child { color: #887b81; }
+  .footer-nf .corazon { color: #e50914; font-size: clamp(3.5rem, 8vw, 5rem); margin-bottom: 8px; animation: latidoSuave 2s infinite; }
+  .footer-nf .cierre-titulo { color: #fff; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(1.35rem, 4vw, 2rem); }
+  .footer-nf .cierre-subtitulo { color: #b7aab0; font-size: 0.9rem; }
+  .volver-portada {
+    margin-top: 20px;
+    padding: 11px 18px;
+    border: 0;
+    border-radius: 5px;
+    color: #111;
+    background: #fff;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
   .cierre-serie {
     background:
       radial-gradient(ellipse at 50% 50%, rgba(147, 15, 50, 0.3), transparent 58%),
@@ -573,7 +673,7 @@
   .navegacion-serie {
     position: absolute;
     z-index: 60;
-    inset: auto 0 22px;
+    inset: auto 0 max(12px, env(safe-area-inset-bottom));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -583,26 +683,23 @@
     letter-spacing: 1px;
   }
   .navegacion-serie button {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: 1px solid rgba(255,255,255,0.24);
     border-radius: 50%;
     background: rgba(15,10,12,0.72);
     color: #fff;
     font-size: 1.1rem;
     cursor: pointer;
+    touch-action: manipulation;
     transition: background 0.2s, transform 0.2s;
-  }
-  .navegacion-serie button:hover:not(:disabled) {
-    background: #e50914;
-    transform: scale(1.08);
   }
   .navegacion-serie button:disabled {
     opacity: 0.35;
     cursor: default;
   }
   .progreso-serie {
-    width: 72px;
+    width: clamp(56px, 10vw, 88px);
     height: 3px;
     overflow: hidden;
     background: rgba(255,255,255,0.2);
@@ -616,6 +713,21 @@
     transition: width 0.3s ease;
   }
 
+  @media (hover: hover) and (pointer: fine) {
+    .boton-play:hover { transform: scale(1.08); }
+    .barra-lateral button:hover { color: #fff; transform: scale(1.15); }
+    .barra-lateral button:hover::after { opacity: 1; transform: translate(0, -50%); }
+    .mensaje-lateral-cerrar:hover { background: rgba(229,9,20,0.8); }
+    .hero-acciones button:hover { transform: translateY(-2px); }
+    .boton-reproducir:hover { background: #e7e7e7; }
+    .boton-info:hover { background: rgba(109,109,110,0.95); }
+    .carta-cerrar:hover { background: #e50914; }
+    .mini-capitulo:hover { transform: translateY(-3px); border-color: #e50914; }
+    .categoria:hover .tarjeta img { transform: scale(1.035); }
+    .volver-portada:hover { background: #e7e7e7; transform: translateY(-2px); }
+    .navegacion-serie button:hover:not(:disabled) { background: #e50914; transform: scale(1.08); }
+  }
+
   /* ---------- EXPLOSIÓN CORAZONES ---------- */
   .explosion {
     position: fixed; pointer-events: none; z-index: 200;
@@ -627,38 +739,50 @@
   }
 
   @media (max-width: 480px) {
-    .slide-serie { padding: 76px 18px 84px; }
+    .slide-serie { padding: calc(70px + env(safe-area-inset-top)) 16px calc(78px + env(safe-area-inset-bottom)); }
     .slide-serie::after { inset: 8% 4%; }
     .hero {
-      padding: 78px 14px 88px 58px;
+      padding: calc(70px + env(safe-area-inset-top)) 14px calc(78px + env(safe-area-inset-bottom)) 58px;
       gap: 0;
     }
-    .barra-lateral { left: 7px; gap: 13px; }
-    .barra-lateral button { width: 34px; height: 34px; }
+    .barra-lateral { left: max(6px, env(safe-area-inset-left)); gap: 11px; }
+    .barra-lateral button { width: 40px; height: 40px; }
+    .barra-lateral button::after { display: none; }
     .hero { background-position: center, center, center, 60% center; }
-    .hero-copy { width: 100%; margin: 0 0 12px; }
+    .hero-copy { width: 100%; max-width: 600px; margin: auto 0 12px; }
     .hero .marca-serie { margin-bottom: 5px; }
     .hero h1 { font-size: 2rem; margin-bottom: 7px; }
     .hero .genero { font-size: 0.66rem; margin-bottom: 7px; }
     .hero p { font-size: 0.78rem; line-height: 1.45; margin-bottom: 8px; }
-    .hero .meta { gap: 9px; font-size: 0.68rem; margin-bottom: 10px; }
+    .hero .meta { gap: 9px; font-size: 0.72rem; margin-bottom: 10px; }
     .hero-acciones { gap: 7px; }
-    .hero-acciones button { min-height: 34px; padding: 0 10px; font-size: 0.74rem; }
+    .hero-acciones button { min-height: 42px; padding: 0 10px; font-size: 0.76rem; }
     .hero-capitulos { margin-top: auto; }
     .hero-capitulos h2 { font-size: 0.8rem; }
-    .hero-capitulos h2 span { font-size: 0.58rem; }
-    .mini-capitulo { flex-basis: 102px; }
-    .mini-imagen { height: 62px; }
+    .mini-capitulo { flex-basis: clamp(118px, 34vw, 142px); }
+    .mini-imagen { height: clamp(66px, 9vh, 82px); }
+    .mini-numero { font-size: 0.62rem; }
+    .mini-titulo { min-height: 2.7em; padding: 7px 8px; font-size: 0.74rem; white-space: normal; line-height: 1.3; }
     .tarjeta .img-cont { height: clamp(135px, 28vh, 220px); }
     .tarjeta .info { padding: 12px 16px 14px; }
     .tarjeta .info p { font-size: 0.82rem; }
     .logo-imagen { width: 180px; }
   }
+  @media (max-width: 360px) {
+    .hero { padding-left: 52px; padding-right: 10px; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero p { font-size: 0.74rem; }
+    .hero-acciones button { padding: 0 8px; font-size: 0.7rem; }
+    .mini-capitulo { flex-basis: 116px; }
+  }
   @media (max-height: 620px) {
-    .hero { padding-top: 72px; padding-bottom: 78px; }
-    .hero-copy { margin-bottom: 6px; }
+    .slide-serie { padding-top: calc(64px + env(safe-area-inset-top)); padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+    .hero { padding-top: calc(64px + env(safe-area-inset-top)); padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+    .hero-copy { margin-bottom: 4px; }
     .hero p { margin-bottom: 8px; }
-    .mini-imagen { height: 54px; }
+    .mini-imagen { height: 56px; }
+    .categoria .img-cont { height: clamp(105px, 24vh, 165px); }
+    .categoria .info { padding: 10px 14px 12px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -702,11 +826,16 @@
   </header>
 
   <aside class="barra-lateral" aria-label="Accesos rápidos">
-    <button type="button" aria-label="Inicio" data-slide-target="0">⌂</button>
-    <button type="button" aria-label="Nuestro comienzo" data-slide-target="1">♡</button>
-    <button type="button" aria-label="Momentos felices" data-slide-target="2">▦</button>
-    <button type="button" aria-label="Final de temporada" data-slide-target="6">∞</button>
+    <button type="button" aria-label="Inicio" data-etiqueta="Inicio" aria-expanded="false" data-mensaje-titulo="Un día bonito" data-mensaje="Que este rinconcito te recuerde cuánto iluminas mis días. 💖">⌂</button>
+    <button type="button" aria-label="Nuestro comienzo" data-etiqueta="Nuestro comienzo" aria-expanded="false" data-mensaje-titulo="Nuestro comienzo" data-mensaje="Desde que te conocí, empezó una de mis historias favoritas: la nuestra. ✨">♡</button>
+    <button type="button" aria-label="Momentos felices" data-etiqueta="Momentos felices" aria-expanded="false" data-mensaje-titulo="Mi sonrisa favorita" data-mensaje="Gracias por cada risa, cada abrazo y todos esos momentos que guardo en el corazón. 😊">▦</button>
+    <button type="button" aria-label="Final de temporada" data-etiqueta="Final de temporada" aria-expanded="false" data-mensaje-titulo="Esto sigue…" data-mensaje="Lo más lindo de nuestra historia es que todavía nos quedan muchos momentos por vivir. ♾️">∞</button>
   </aside>
+  <div class="mensaje-lateral" id="mensajeLateral" role="status" aria-live="polite" hidden>
+    <button type="button" class="mensaje-lateral-cerrar" id="cerrarMensajeLateral" aria-label="Cerrar mensaje">×</button>
+    <strong id="mensajeLateralTitulo"></strong>
+    <p id="mensajeLateralTexto"></p>
+  </div>
 
   <main class="carrusel-serie" id="carruselSerie" aria-label="Historia de nuestra serie" tabindex="0">
   <section class="slide-serie hero" aria-label="Presentación">
@@ -726,7 +855,7 @@
       </div>
     </div>
     <div class="hero-capitulos">
-      <h2>Nuestra historia <span>DESLIZA PARA VER MÁS&nbsp; →</span></h2>
+      <h2>Nuestra historia</h2>
       <div class="mini-fila" aria-label="Capítulos de la historia">
         <button type="button" class="mini-capitulo" data-slide-target="1" aria-label="Abrir capítulo 1: El día que te conocí">
           <span class="mini-imagen"><span>💞</span><span class="mini-numero">CAP. 01</span><img src="imagenes/el dia que te conoci.jpeg" alt="" onerror="this.style.display='none'"></span>
@@ -845,8 +974,9 @@
   <section class="slide-serie cierre-serie" aria-label="Final de temporada">
     <footer class="footer-nf">
       <div class="corazon">❤️</div>
-      <div>Por siempre mi bebecita</div>
-      <div>Hecho con amor, solo para ti.</div>
+      <div class="cierre-titulo">Por siempre mi bebecita</div>
+      <div class="cierre-subtitulo">Hecho con amor, solo para ti.</div>
+      <button type="button" class="volver-portada" data-slide-target="0">Volver a Inicio</button>
     </footer>
   </section>
   </main>
@@ -960,9 +1090,14 @@
   const cartaDialogo = document.getElementById('cartaAmor');
   const abrirCarta = document.getElementById('abrirCarta');
   const cerrarCarta = document.getElementById('cerrarCarta');
+  const mensajeLateral = document.getElementById('mensajeLateral');
+  const mensajeLateralTitulo = document.getElementById('mensajeLateralTitulo');
+  const mensajeLateralTexto = document.getElementById('mensajeLateralTexto');
+  const cerrarMensajeLateral = document.getElementById('cerrarMensajeLateral');
   const barraProgreso = document.getElementById('barraProgreso');
   const slides = carrusel ? Array.from(carrusel.children) : [];
   const capitulos = slides.filter((slide) => slide.classList.contains('categoria'));
+  let ultimoIndiceSlide = 0;
 
   function indiceSlideActual() {
     if (!carrusel || !carrusel.clientWidth) return 0;
@@ -975,6 +1110,7 @@
   function actualizarNavegacion() {
     if (!slides.length) return;
     const indice = indiceSlideActual();
+    ultimoIndiceSlide = indice;
     const slideActual = slides[indice];
     const indiceCapitulo = capitulos.indexOf(slideActual);
 
@@ -1010,6 +1146,46 @@
     if (event.target === cartaDialogo) cartaDialogo.close();
   });
 
+  let temporizadorMensajeLateral;
+
+  function ocultarMensajeLateral() {
+    clearTimeout(temporizadorMensajeLateral);
+    mensajeLateral.classList.remove('visible');
+    document.querySelectorAll('.barra-lateral button[aria-expanded="true"]').forEach((boton) => {
+      boton.setAttribute('aria-expanded', 'false');
+    });
+    temporizadorMensajeLateral = setTimeout(() => { mensajeLateral.hidden = true; }, 180);
+  }
+
+  document.querySelectorAll('.barra-lateral button[data-mensaje]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const yaAbierto = boton.getAttribute('aria-expanded') === 'true';
+      ocultarMensajeLateral();
+      if (yaAbierto) return;
+
+      const rect = boton.getBoundingClientRect();
+      const top = Math.max(90, Math.min(window.innerHeight - 90, rect.top + rect.height / 2));
+      clearTimeout(temporizadorMensajeLateral);
+      mensajeLateral.style.top = `${top}px`;
+      mensajeLateralTitulo.textContent = boton.dataset.mensajeTitulo;
+      mensajeLateralTexto.textContent = boton.dataset.mensaje;
+      mensajeLateral.hidden = false;
+      boton.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(() => mensajeLateral.classList.add('visible'));
+    });
+  });
+  cerrarMensajeLateral.addEventListener('click', ocultarMensajeLateral);
+  document.addEventListener('click', (event) => {
+    if (!mensajeLateral.hidden &&
+        !mensajeLateral.contains(event.target) &&
+        !event.target.closest('.barra-lateral')) {
+      ocultarMensajeLateral();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !mensajeLateral.hidden) ocultarMensajeLateral();
+  });
+
   if (carrusel) {
     botonAnterior.addEventListener('click', () => irASlide(indiceSlideActual() - 1));
     botonSiguiente.addEventListener('click', () => irASlide(indiceSlideActual() + 1));
@@ -1026,7 +1202,10 @@
         irASlide(indiceSlideActual() + (event.key === 'ArrowRight' ? 1 : -1));
       }
     });
-    window.addEventListener('resize', actualizarNavegacion);
+    window.addEventListener('resize', () => {
+      carrusel.scrollLeft = ultimoIndiceSlide * carrusel.clientWidth;
+      actualizarNavegacion();
+    });
     actualizarNavegacion();
   }
 
